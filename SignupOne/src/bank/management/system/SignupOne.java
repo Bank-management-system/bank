@@ -2,6 +2,7 @@ package  bank.management.system;
 
 import javax.swing.*;
 import java.awt.*;
+import java.sql.SQLException;
 import java.util.*;
 import com.toedter.calendar.JDateChooser;
 import java.awt.event.*;
@@ -9,10 +10,15 @@ import java.awt.event.*;
 public class SignupOne extends JFrame implements ActionListener {
 
     long random;
-    JTextField nameTextField, fnameTextField, emailTextField, addressTextField, cityTextField, stateTextField,  pincodeTextField;
+    JTextField nameTextField, fnameTextField, emailTextField, addressTextField, cityTextField, stateTextField,  pincodeTextField, mobilenoTextField;
     JButton next;
     JRadioButton male, female, other, married, unmarried;
     JDateChooser datechooser;
+    private String generateOTP() {
+        Random rand = new Random();
+        int otpValue = 100000 + rand.nextInt(900000);
+        return String.valueOf(otpValue);
+    }
     SignupOne(){
 
         setLayout(null);
@@ -77,7 +83,6 @@ public class SignupOne extends JFrame implements ActionListener {
         ButtonGroup gendergroup  = new ButtonGroup();
         gendergroup.add(male);
         gendergroup.add(female);
-
 //email
         JLabel email=new JLabel("Email Address:");
         email.setFont(new Font("Raleway", Font.BOLD, 20));
@@ -107,9 +112,9 @@ public class SignupOne extends JFrame implements ActionListener {
         other.setBackground(Color.WHITE);
         add(other);
         ButtonGroup maritalgroup  = new ButtonGroup();
-        gendergroup.add(married);
-        gendergroup.add(unmarried);
-        gendergroup.add(other);
+        maritalgroup.add(married);
+        maritalgroup.add(unmarried);
+        maritalgroup.add(other);
 //address
         JLabel address=new JLabel("Address:");
         address.setFont(new Font("Raleway", Font.BOLD, 20));
@@ -150,12 +155,22 @@ public class SignupOne extends JFrame implements ActionListener {
         pincodeTextField.setFont(new Font("Raleway", Font.BOLD, 14));
         pincodeTextField.setBounds(300,590,400,30);
         add(pincodeTextField);
+        //mobile
+        JLabel mobileno=new JLabel("Mobile no.:");
+        mobileno.setFont(new Font("Raleway", Font.BOLD, 20));
+        mobileno.setBounds(100,640,200,30);
+        add(mobileno);
+//textfield
+        mobilenoTextField = new JTextField();
+        mobilenoTextField.setFont(new Font("Raleway", Font.BOLD, 14));
+        mobilenoTextField.setBounds(300,640,400,30);
+        add(mobilenoTextField);
 //next button
         JButton next = new JButton("Next");
         next.setBackground(Color.BLACK);
         next.setForeground(Color.WHITE);
         next.setFont(new Font("Raleway", Font.BOLD, 14));
-        next.setBounds(620,660,80,30);
+        next.setBounds(620,710,80,30);
         next.addActionListener(this);
         add(next);
 
@@ -192,19 +207,28 @@ public class SignupOne extends JFrame implements ActionListener {
         String city = cityTextField.getText();
         String state = stateTextField.getText();
         String pincode = pincodeTextField.getText();
+        String mobileno = mobilenoTextField.getText();
 
         try {
             if (name.equals("")){
                 JOptionPane.showMessageDialog(null,"Name is Required");
-            }else {
-                Conn c = new Conn();
-                String query ="insert into signup values(' "+formno+" ', ' "+name+" ',' "+fname+" ',' "+dob+" ',' "+gender+" ',' "+email+" ',' "+marital+" ',' "+address+" ',' "+city+" ',' "+pincode+" ',' "+state+" ')";
-                c.s.executeUpdate(query);
+            }else if (mobileno.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Mobile number is required.");
             }
-        }catch (Exception e){
+            else {
+                Conn c = new Conn();
+                String query ="insert into signup values(' "+formno+" ', ' "+name+" ',' "+fname+" ',' "+dob+" ',' "+gender+" ',' "+email+" ',' "+marital+" ',' "+address+" ',' "+city+" ',' "+pincode+" ',' "+state+" ',' "+mobileno+" ')";
+                c.s.executeUpdate(query);
+                new Signuptwo(formno).setVisible(true);
+                setVisible(false);
+                    }
+        }
+        catch (Exception e){
             System.out.println(e);
         }
+
     }
+
     public static void main(String[] args) {
         new SignupOne();
     }
