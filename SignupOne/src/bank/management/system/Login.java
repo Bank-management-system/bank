@@ -1,96 +1,117 @@
 package  bank.management.system;
 import javax.swing.*;
 import java.awt.*;
+import java.sql.ResultSet;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class Login extends JFrame implements ActionListener
-{
-    JButton login,signup,clear;
-    JTextField cardTextfeild;
-    JPasswordField pinTextfeild;
-    Login()
-    {
-        setLayout(null);
-        setSize(850,480);
-        setLocation(450,200);
-        setVisible(true);
-        setTitle("Welcome to Maharashtra Bank");
+public class Login extends JFrame implements ActionListener {
+    JLabel l1, l2, l3;
+    JTextField tf1;
+    JPasswordField pf2;
+    JButton b1, b2, b3;
+
+    Login() {
+        setTitle("AUTOMATED TELLER MACHINE");
+
         ImageIcon i1 = new ImageIcon(ClassLoader.getSystemResource("iconslogo.jpg"));
-        Image i2 = i1.getImage().getScaledInstance(100,100, Image.SCALE_DEFAULT);
+        Image i2 = i1.getImage().getScaledInstance(100, 100, Image.SCALE_DEFAULT);
         ImageIcon i3 = new ImageIcon(i2);
-        JLabel label = new JLabel(i3);
-        label.setBounds(70,10,100,100);
-        add(label);
-        getContentPane().setBackground(Color.white);
+        JLabel l11 = new JLabel(i3);
+        l11.setBounds(70, 10, 100, 100);
+        add(l11);
 
-        JLabel text = new JLabel("Welcome to the Bank");
-        add(text);
-        text.setFont(new Font("Osward",Font.BOLD,38));
-        text.setBounds(200,40,400,40);
+        l1 = new JLabel("WELCOME TO ATM");
+        l1.setFont(new Font("Osward", Font.BOLD, 38));
+        l1.setBounds(200, 40, 450, 40);
+        add(l1);
 
-        JLabel Card_No = new JLabel("Card_No : ");
-        add(Card_No);
-        Card_No.setFont(new Font("Raleway",Font.BOLD,28));
-        Card_No.setBounds(120,150,150,40);
+        l2 = new JLabel("Card No:");
+        l2.setFont(new Font("Raleway", Font.BOLD, 28));
+        l2.setBounds(125, 150, 375, 30);
+        add(l2);
 
-        JLabel Pin = new JLabel("Pin : ");
-        add(Pin);
-        Pin.setFont(new Font("Raleway",Font.BOLD,28));
-        Pin.setBounds(120,200,150,40);
+        tf1 = new JTextField(15);
+        tf1.setBounds(300, 150, 230, 30);
+        tf1.setFont(new Font("Arial", Font.BOLD, 14));
+        add(tf1);
 
-        cardTextfeild = new JTextField();
-        cardTextfeild.setBounds(300,150,250,40);
-        cardTextfeild.setFont(new Font("Arial",Font.BOLD,20));
-        add(cardTextfeild);
+        l3 = new JLabel("PIN:");
+        l3.setFont(new Font("Raleway", Font.BOLD, 28));
+        l3.setBounds(125, 220, 375, 30);
+        add(l3);
 
-        pinTextfeild = new JPasswordField();
-        pinTextfeild.setBounds(300,200,250,40);
-        pinTextfeild.setFont(new Font("Arial",Font.BOLD,14));
-        add(pinTextfeild);
+        pf2 = new JPasswordField(15);
+        pf2.setFont(new Font("Arial", Font.BOLD, 14));
+        pf2.setBounds(300, 220, 230, 30);
+        add(pf2);
 
-        login = new JButton("Sign In");
-        login.setBounds(300,300,100,30);
-        login.setForeground(Color.BLACK);
-        login.setBackground(Color.WHITE);
-        login.addActionListener(this);
-        add(login);
+        b1 = new JButton("SIGN IN");
+        b1.setBackground(Color.BLACK);
+        b1.setForeground(Color.WHITE);
 
-        clear = new JButton("Clear");
-        clear.setBounds(430,300,100,30);
-        clear.setForeground(Color.BLACK);
-        clear.setBackground(Color.WHITE);
-        clear.addActionListener(this);
-        add(clear);
+        b2 = new JButton("CLEAR");
+        b2.setBackground(Color.BLACK);
+        b2.setForeground(Color.WHITE);
 
-        signup = new JButton("Sign Up");
-        signup.setBounds(300,350,230,30);
-        signup.setForeground(Color.BLACK);
-        signup.setBackground(Color.WHITE);
-        signup.addActionListener(this);
-        add(signup);
-    }
+        b3 = new JButton("SIGN UP");
+        b3.setBackground(Color.BLACK);
+        b3.setForeground(Color.WHITE);
 
-    public void actionPerformed(ActionEvent ae)
-    {
-        if (ae.getSource()==clear)
-        {
-            cardTextfeild.setText("");
-            pinTextfeild.setText("");
-        }
-        else if (ae.getSource()==login)
-        {
+        setLayout(null);
 
-        } else if (ae.getSource()==signup)
-        {
-            setVisible(false);
-            new SignupOne().setVisible(true);
-        }
+        b1.setFont(new Font("Arial", Font.BOLD, 14));
+        b1.setBounds(300, 300, 100, 30);
+        add(b1);
+
+        b2.setFont(new Font("Arial", Font.BOLD, 14));
+        b2.setBounds(430, 300, 100, 30);
+        add(b2);
+
+        b3.setFont(new Font("Arial", Font.BOLD, 14));
+        b3.setBounds(300, 350, 230, 30);
+        add(b3);
+
+        b1.addActionListener(this);
+        b2.addActionListener(this);
+        b3.addActionListener(this);
+
+        getContentPane().setBackground(Color.WHITE);
+
+        setSize(800, 480);
+        setLocation(550, 200);
+        setVisible(true);
 
     }
 
-    public static void main(String[]args)
-    {
-        new Login();
+    public void actionPerformed(ActionEvent ae) {
+        try {
+            if (ae.getSource() == b1) {
+                Conn c1 = new Conn();
+                String cardno = tf1.getText();
+                String pin = pf2.getText();
+                String q = "select * from login where cardno = '" + cardno + "' and pin = '" + pin + "'";
+
+                ResultSet rs = c1.s.executeQuery(q);
+                if (rs.next()) {
+                    setVisible(false);
+                    new Transactions(pin).setVisible(true);
+                } else {
+                    JOptionPane.showMessageDialog(null, "Incorrect Card Number or PIN");
+                }
+            } else if (ae.getSource() == b2) {
+                tf1.setText("");
+                pf2.setText("");
+            } else if (ae.getSource() == b3) {
+                setVisible(false);
+                new SignupOne().setVisible(true);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void main(String[] args) {
+        new Login().setVisible(true);
     }
 }
